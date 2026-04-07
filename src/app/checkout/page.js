@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   CheckCircle2, Package, Truck, 
@@ -12,8 +12,8 @@ import { useCart } from '@/context/CartContext';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
-export default function CheckoutPage() {
-  const { cart, totalPrice, clearCart } = useCart();
+function CheckoutContent() {
+  const { cartItems, cartTotal, clearCart } = useCart();
   const [step, setStep] = useState('checkout'); // checkout, processing, success
 
   const handlePlaceOrder = () => {
@@ -173,7 +173,7 @@ export default function CheckoutPage() {
               <div className="relative z-10">
                  <h3 className="text-2xl font-black tracking-tighter mb-8">Order Summary</h3>
                  <div className="space-y-6 max-h-[300px] overflow-y-auto custom-scrollbar pr-4 mb-8">
-                    {cart.map((item) => (
+                    {cartItems.map((item) => (
                        <div key={item.id} className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
                              <div className="w-10 h-10 bg-white/10 dark:bg-slate-950/10 rounded-xl flex items-center justify-center relative shadow-lg">
@@ -193,7 +193,7 @@ export default function CheckoutPage() {
                  <div className="space-y-4 pt-6 border-t border-white/10 dark:border-slate-900/10">
                     <div className="flex items-center justify-between text-slate-400">
                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Subtotal</span>
-                       <span className="text-xs font-bold text-white dark:text-slate-900">Rs. {totalPrice}</span>
+                       <span className="text-xs font-bold text-white dark:text-slate-900">Rs. {cartTotal}</span>
                     </div>
                     <div className="flex items-center justify-between text-slate-400">
                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Surgcharge</span>
@@ -201,7 +201,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex items-center justify-between pt-4 border-t border-white/10 dark:border-slate-900/10">
                        <span className="text-xl font-black text-white dark:text-slate-900">Total</span>
-                       <span className="text-2xl font-black text-primary">Rs. {totalPrice + 80}</span>
+                       <span className="text-2xl font-black text-primary">Rs. {cartTotal + 80}</span>
                     </div>
                  </div>
 
@@ -238,5 +238,17 @@ export default function CheckoutPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <CheckoutContent />
+    </Suspense>
   );
 }
